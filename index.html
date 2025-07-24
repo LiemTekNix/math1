@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Toán Thần Tốc - Bé Lớp 1</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      text-align: center;
+      background-color: #fff0f5;
+    }
+    h1 {
+      color: #ff69b4;
+      margin-top: 20px;
+    }
+    .question {
+      font-size: 32px;
+      margin: 20px 0;
+    }
+    .btn {
+      padding: 15px 30px;
+      margin: 10px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: 2px solid #ffa07a;
+      background-color: #fffacd;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #f0e68c;
+    }
+    .score {
+      font-size: 24px;
+      margin-top: 20px;
+      color: green;
+    }
+    .image-box {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .image-box img {
+      width: 60px;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎮 Toán Thần Tốc: Cộng & Nhân</h1>
+  <div class="image-box" id="images"></div>
+  <div class="question" id="question">Đang tạo câu hỏi...</div>
+  <div id="answers"></div>
+  <div class="score" id="score">Điểm: 0 ⭐</div>
+
+  <!-- Âm thanh -->
+  <audio id="correctSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c44fa2479e.mp3?filename=success-1-6297.mp3"></audio>
+  <audio id="wrongSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8d925f382b.mp3?filename=wrong-answer-129254.mp3"></audio>
+
+  <script>
+    let score = 0;
+
+    function generateQuestion() {
+      const mode = Math.random() > 0.5 ? 'add' : 'mul';
+      const num1 = Math.floor(Math.random() * 5) + 1;
+      const num2 = Math.floor(Math.random() * 5) + 1;
+      const correctAnswer = mode === 'add' ? num1 + num2 : num1 * num2;
+      const questionText = mode === 'add' ? `${num1} + ${num2} = ?` : `${num1} × ${num2} = ?`;
+
+      document.getElementById("question").textContent = questionText;
+      document.getElementById("score").textContent = `Điểm: ${score} ⭐`;
+
+      // Hình ảnh
+      const imageBox = document.getElementById("images");
+      imageBox.innerHTML = "";
+      const imgURL = "https://cdn-icons-png.flaticon.com/512/616/616408.png"; // hình con gấu
+      for (let i = 0; i < num1 + num2; i++) {
+        const img = document.createElement("img");
+        if (mode === 'add') {
+          if (i < num1) img.style.filter = "grayscale(0%)";
+          else img.style.filter = "grayscale(50%)";
+        }
+        img.src = imgURL;
+        imageBox.appendChild(img);
+      }
+
+      // Đáp án
+      let answers = [correctAnswer];
+      while (answers.length < 3) {
+        const wrong = correctAnswer + (Math.floor(Math.random() * 5) - 2);
+        if (wrong !== correctAnswer && wrong >= 0 && !answers.includes(wrong)) {
+          answers.push(wrong);
+        }
+      }
+      answers.sort(() => Math.random() - 0.5);
+
+      const answerDiv = document.getElementById("answers");
+      answerDiv.innerHTML = "";
+      answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.textContent = ans;
+        btn.className = "btn";
+        btn.onclick = () => {
+          if (ans === correctAnswer) {
+            document.getElementById("correctSound").play();
+            score++;
+            alert("🎉 Chính xác rồi!");
+          } else {
+            document.getElementById("wrongSound").play();
+            alert("😢 Sai rồi. Cố lên nhé!");
+          }
+          generateQuestion();
+        };
+        answerDiv.appendChild(btn);
+      });
+    }
+
+    generateQuestion();
+  </script>
+</body>
+</html>
