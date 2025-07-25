@@ -115,6 +115,8 @@
     <button onclick="setTheme('princess')">👸 Công chúa</button>
     <button onclick="setTheme('superhero')">🦸 Siêu nhân</button>
     <button onclick="setTheme('robot')">🤖 Robot</button>
+    <button onclick="setTheme('dino')">🦖 Khủng long</button>
+    <button onclick="setTheme('fruit')">🍎 Trái cây</button>
   </div>
 
   <div class="badge-box" id="badgeBox"></div>
@@ -158,18 +160,20 @@
 
     function nextQuestion() {
       let a, b, op;
-      do {
+      op = ['+', '-', 'x'][Math.floor(Math.random() * 3)];
+      if (op === 'x') {
+        a = Math.floor(Math.random() * 10) + 1;
+        b = 2;
+      } else {
         a = Math.floor(Math.random() * 90 + 10);
         b = Math.floor(Math.random() * 90 + 10);
-        op = ['+', '-', 'x'][Math.floor(Math.random() * 3)];
-        if (op === 'x') b = 2;
-
-        switch(op) {
-          case '+': currentAnswer = a + b; break;
-          case '-': currentAnswer = a - b; break;
-          case 'x': currentAnswer = a * b; break;
-        }
-      } while (currentAnswer > 100 || currentAnswer < 0);
+      }
+      switch(op) {
+        case '+': currentAnswer = a + b; break;
+        case '-': currentAnswer = a - b; break;
+        case 'x': currentAnswer = a * b; break;
+      }
+      if (currentAnswer > 100 || currentAnswer < 0) return nextQuestion();
 
       const q = `${a} ${op} ${b}`;
       document.getElementById("question").innerText = `Câu hỏi: ${q}`;
@@ -260,6 +264,12 @@
           break;
         case 'robot':
           body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/3616/3616952.png')";
+          break;
+        case 'dino':
+          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/616/616408.png')";
+          break;
+        case 'fruit':
+          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/1998/1998614.png')";
           break;
         default:
           body.style.backgroundImage = '';
