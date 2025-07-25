@@ -83,6 +83,11 @@
       border-radius: 50%;
       animation: fly 1s ease-out forwards;
     }
+    .sticker {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+    }
     @keyframes fly {
       0% {
         transform: translateY(0);
@@ -113,10 +118,12 @@
   </div>
 
   <div class="badge-box" id="badgeBox"></div>
+  <div id="rewardStickers"></div>
   <div class="image-box" id="images"></div>
   <div class="question" id="question"></div>
   <div id="answers"></div>
   <div class="score" id="score"></div>
+  <div class="score" id="summary"></div>
   <button class="btn" onclick="resetGame()">🔁 Chơi lại từ đầu</button>
 
   <audio id="voiceCorrect" src="voice_correct.mp3"></audio>
@@ -128,6 +135,8 @@
     let currentAnswer = 0;
     let score = 0;
     let total = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
 
     function startGame() {
       const nameInput = document.getElementById("playerNameInput");
@@ -190,15 +199,21 @@
       const playerName = document.body.getAttribute("data-player") || "Bé yêu";
       if (ans === currentAnswer) {
         score++;
+        correctCount++;
         document.getElementById("badgeBox").innerText = `🎉 Tuyệt vời ${playerName}!`;
         playSound("voiceCorrect");
         showStars();
-        if (score % 5 === 0) playSound("clap");
+        if (score % 5 === 0) {
+          playSound("clap");
+          showSticker();
+        }
       } else {
+        wrongCount++;
         document.getElementById("badgeBox").innerText = `😢 Sai rồi, cố lên ${playerName}!`;
         playSound("voiceWrong");
       }
       document.getElementById("score").innerText = `Điểm: ${score}/${total}`;
+      document.getElementById("summary").innerText = `✔️ Đúng: ${correctCount} | ❌ Sai: ${wrongCount}`;
       setTimeout(() => {
         document.getElementById("badgeBox").innerText = "";
         nextQuestion();
@@ -217,6 +232,19 @@
       }
     }
 
+    function showSticker() {
+      const stickers = [
+        'https://cdn-icons-png.flaticon.com/512/2583/2583115.png',
+        'https://cdn-icons-png.flaticon.com/512/2583/2583143.png',
+        'https://cdn-icons-png.flaticon.com/512/2583/2583113.png'
+      ];
+      const rand = Math.floor(Math.random() * stickers.length);
+      const img = document.createElement('img');
+      img.src = stickers[rand];
+      img.className = 'sticker';
+      document.getElementById('rewardStickers').appendChild(img);
+    }
+
     function resetGame() {
       location.reload();
     }
@@ -225,13 +253,13 @@
       const body = document.body;
       switch (theme) {
         case 'princess':
-          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/4185/4185614.png')";
+          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/3468/3468086.png')";
           break;
         case 'superhero':
           body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/3468/3468376.png')";
           break;
         case 'robot':
-          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/2965/2965879.png')";
+          body.style.backgroundImage = "url('https://cdn-icons-png.flaticon.com/512/3616/3616952.png')";
           break;
         default:
           body.style.backgroundImage = '';
