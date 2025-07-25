@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jump & Learn - Game học tiếng Anh vui nhộn!</title>
+    <title>Jump & Learn - Game học tiếng Anh</title>
     <style>
         body {
             font-family: 'Comic Sans MS', cursive, sans-serif;
@@ -39,12 +39,10 @@
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             transition: transform 0.2s;
-            overflow: hidden;
         }
-        .word-box img {
+        .word-box svg {
             width: 80px;
             height: 80px;
-            object-fit: contain;
             margin-bottom: 10px;
         }
         .word-box:hover {
@@ -82,15 +80,11 @@
             margin: 20px 0;
         }
         .speaker-icon {
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
             filter: brightness(0) invert(1);
-        }
-        .loading {
-            font-size: 18px;
-            color: #6c5ce7;
         }
     </style>
 </head>
@@ -113,47 +107,68 @@
     </div>
 
     <script>
-        // Danh sách từ vựng với hình ảnh từ OpenMoji (hoạt động ổn định)
+        // Danh sách từ vựng với SVG tích hợp sẵn
         const words = [
             { 
                 word: "CAT", 
-                action: "Meow meow!", 
-                image: "https://openmoji.org/data/color/svg/1F431.svg" 
+                action: "Meow meow!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30,40 Q50,20 70,40 Q75,50 70,60 Q50,80 30,60 Q25,50 30,40" fill="#ff9ff3"/>
+                        <circle cx="40" cy="45" r="5" fill="white"/>
+                        <circle cx="60" cy="45" r="5" fill="white"/>
+                        <circle cx="40" cy="45" r="2" fill="black"/>
+                        <circle cx="60" cy="45" r="2" fill="black"/>
+                        <path d="M45,60 Q50,65 55,60" stroke="black" fill="none" stroke-width="2"/>
+                    </svg>`
             },
             { 
                 word: "DOG", 
-                action: "Woof woof!", 
-                image: "https://openmoji.org/data/color/svg/1F436.svg" 
+                action: "Woof woof!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30,50 Q40,30 70,30 Q80,40 70,60 Q60,70 40,65 Q30,60 30,50" fill="#feca57"/>
+                        <circle cx="45" cy="45" r="5" fill="white"/>
+                        <circle cx="65" cy="45" r="5" fill="white"/>
+                        <circle cx="45" cy="45" r="2" fill="black"/>
+                        <circle cx="65" cy="45" r="2" fill="black"/>
+                        <path d="M50,60 Q60,65 65,60" stroke="black" fill="none" stroke-width="2"/>
+                    </svg>`
             },
             { 
                 word: "SUN", 
-                action: "Sunshine!", 
-                image: "https://openmoji.org/data/color/svg/2600.svg" 
+                action: "Sunshine!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="30" fill="#ff9f43"/>
+                        <path d="M50,10 L50,20 M50,80 L50,90 M10,50 L20,50 M80,50 L90,50 
+                                 M25,25 L32,32 M68,68 L75,75 M25,75 L32,68 M68,32 L75,25" 
+                              stroke="#ff9f43" stroke-width="4"/>
+                    </svg>`
             },
             { 
                 word: "BALL", 
-                action: "Bounce!", 
-                image: "https://openmoji.org/data/color/svg/26BD.svg" 
+                action: "Bounce!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" fill="#1dd1a1"/>
+                        <path d="M30,30 Q50,20 70,30 Q80,50 70,70 Q50,80 30,70 Q20,50 30,30" 
+                              stroke="#10ac84" fill="none" stroke-width="2"/>
+                    </svg>`
             },
             { 
                 word: "APPLE", 
-                action: "Yummy!", 
-                image: "https://openmoji.org/data/color/svg/1F34E.svg" 
+                action: "Yummy!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50,20 Q60,5 70,20 Q80,40 70,60 Q60,80 50,75 Q40,80 30,60 Q20,40 30,20 Q40,5 50,20" 
+                              fill="#ff6b6b"/>
+                        <path d="M50,15 L50,5 M45,10 L55,10" stroke="#2ecc71" stroke-width="3"/>
+                    </svg>`
             },
             { 
                 word: "JUMP", 
-                action: "Jump high!", 
-                image: "https://openmoji.org/data/color/svg/1F3C3.svg" 
-            },
-            { 
-                word: "HAPPY", 
-                action: "Smile!", 
-                image: "https://openmoji.org/data/color/svg/1F600.svg" 
-            },
-            { 
-                word: "RED", 
-                action: "Color red!", 
-                image: "https://openmoji.org/data/color/svg/1F534.svg" 
+                action: "Jump high!",
+                svg: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="40" r="20" fill="#feca57"/>
+                        <path d="M50,60 L50,80 M40,70 L60,70" stroke="#576574" stroke-width="5"/>
+                        <path d="M30,40 L20,20 M70,40 L80,20" stroke="#576574" stroke-width="4"/>
+                    </svg>`
             }
         ];
         
@@ -162,17 +177,12 @@
         let gameStarted = false;
         let synth = window.speechSynthesis;
         
-        // Kiểm tra trình duyệt hỗ trợ Web Speech API
-        if (!synth) {
-            alert("Trình duyệt của bạn không hỗ trợ đọc văn bản. Vui lòng dùng Chrome/Firefox/Safari mới nhất.");
-        }
-        
         function speakWord(word) {
             if (synth) {
-                synth.cancel(); // Dừng đọc câu trước
+                synth.cancel();
                 const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang = 'en-US'; // Giọng đọc tiếng Anh
-                utterance.rate = 0.8; // Tốc độ chậm
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
                 synth.speak(utterance);
             }
         }
@@ -181,44 +191,28 @@
             const gameBoard = document.getElementById('gameBoard');
             gameBoard.innerHTML = '';
             
-            // Hiển thị loading nếu hình ảnh chưa tải xong
-            gameBoard.innerHTML = '<div class="loading">Đang tải trò chơi...</div>';
-            
-            // Trộn mảng từ ngẫu nhiên
             const shuffledWords = [...words].sort(() => Math.random() - 0.5).slice(0, 6);
             
-            // Tạo các ô từ
-            let loadedImages = 0;
             shuffledWords.forEach(wordObj => {
                 const box = document.createElement('div');
                 box.className = 'word-box';
                 
-                // Thêm hình ảnh
-                const img = document.createElement('img');
-                img.src = wordObj.image;
-                img.alt = wordObj.word;
-                img.onload = () => {
-                    loadedImages++;
-                    if (loadedImages === shuffledWords.length) {
-                        document.querySelector('.loading')?.remove();
-                    }
-                };
+                // Thêm SVG hình ảnh
+                box.innerHTML = wordObj.svg;
                 
                 // Thêm từ
                 const wordText = document.createElement('div');
                 wordText.textContent = wordObj.word;
+                box.appendChild(wordText);
                 
                 // Thêm icon loa
                 const speaker = document.createElement('img');
-                speaker.src = 'https://openmoji.org/data/color/svg/1F50A.svg';
+                speaker.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJ2MTYuODc1Yy0zLjUyNyAwLTYuODQzLTEuNjc1LTkuMjUtNC41LS4yMTktLjI1LS4xODgtLjYyNS4wNjItLjg0NC4yNS0uMjE5LjYyNS0uMTg4Ljg0NC4wNjIgMi40MTcgMi43NSA1Ljg3NSA0LjA2MyA5LjM0NCA0LjA2M3YtMTZjLTQuMDk0IDAtNy43MTQgMi42ODUtOSA2LjU2My0uMTU2LjUuMTg4Ljk2OS42ODguNzUuNDk0LS4xODcuNzUtLjY4Ny42NTYtMS4xNTZDNS4zMTMgNy4wMzEgOC4yNSA1IDExLjUgNWgzVjJ6IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==';
                 speaker.className = 'speaker-icon';
                 speaker.onclick = (e) => {
                     e.stopPropagation();
                     speakWord(wordObj.word);
                 };
-                
-                box.appendChild(img);
-                box.appendChild(wordText);
                 box.appendChild(speaker);
                 
                 box.onclick = function() {
@@ -235,6 +229,7 @@
                         }, 1500);
                     }
                 };
+                
                 gameBoard.appendChild(box);
             });
         }
@@ -259,14 +254,10 @@
         }
         
         function speakCurrentWord() {
-            if (currentWord) {
-                speakWord(currentWord);
-            }
+            if (currentWord) speakWord(currentWord);
         }
         
-        // Khởi tạo khi tải trang
         window.onload = () => {
-            // Kiểm tra quyền sử dụng giọng nói
             if (synth && synth.onvoiceschanged !== undefined) {
                 synth.onvoiceschanged = createGameBoard;
             }
