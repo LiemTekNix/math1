@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump & Learn - Game học tiếng Anh vui nhộn!</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px #ccc;
+        }
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        .word-box {
+            width: 120px;
+            height: 150px;
+            background-color: #74b9ff;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+        .word-box img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .word-box:hover {
+            transform: scale(1.05);
+        }
+        .word-box.selected {
+            background-color: #ff7675;
+            transform: scale(1.1);
+        }
+        .controls {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #55efc4;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: #00b894;
+        }
+        .score {
+            font-size: 24px;
+            color: #6c5ce7;
+            margin: 10px 0;
+        }
+        .action-text {
+            font-size: 28px;
+            color: #e84393;
+            height: 40px;
+            margin: 20px 0;
+        }
+        .speaker-icon {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            margin-top: 10px;
+            filter: brightness(0) invert(1);
+        }
+        .loading {
+            font-size: 18px;
+            color: #6c5ce7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Jump & Learn! 🎮</h1>
+    <p>Nhảy vào ô có từ ba/mẹ đọc nhé!</p>
+    
+    <div class="action-text" id="actionText">Bấm "Bắt đầu" để chơi!</div>
+    
+    <div class="score">Điểm: <span id="score">0</span></div>
+    
+    <div class="game-container" id="gameBoard">
+        <!-- Các ô từ sẽ được thêm bằng JavaScript -->
+    </div>
+    
+    <div class="controls">
+        <button onclick="startGame()">Bắt đầu</button>
+        <button onclick="nextWord()">Từ tiếp theo</button>
+        <button onclick="speakCurrentWord()">🔊 Nghe lại</button>
+    </div>
+
+    <script>
+        // Danh sách từ vựng với hình ảnh từ OpenMoji (hoạt động ổn định)
+        const words = [
+            { 
+                word: "CAT", 
+                action: "Meow meow!", 
+                image: "https://openmoji.org/data/color/svg/1F431.svg" 
+            },
+            { 
+                word: "DOG", 
+                action: "Woof woof!", 
+                image: "https://openmoji.org/data/color/svg/1F436.svg" 
+            },
+            { 
+                word: "SUN", 
+                action: "Sunshine!", 
+                image: "https://openmoji.org/data/color/svg/2600.svg" 
+            },
+            { 
+                word: "BALL", 
+                action: "Bounce!", 
+                image: "https://openmoji.org/data/color/svg/26BD.svg" 
+            },
+            { 
+                word: "APPLE", 
+                action: "Yummy!", 
+                image: "https://openmoji.org/data/color/svg/1F34E.svg" 
+            },
+            { 
+                word: "JUMP", 
+                action: "Jump high!", 
+                image: "https://openmoji.org/data/color/svg/1F3C3.svg" 
+            },
+            { 
+                word: "HAPPY", 
+                action: "Smile!", 
+                image: "https://openmoji.org/data/color/svg/1F600.svg" 
+            },
+            { 
+                word: "RED", 
+                action: "Color red!", 
+                image: "https://openmoji.org/data/color/svg/1F534.svg" 
+            }
+        ];
+        
+        let currentWord = "";
+        let score = 0;
+        let gameStarted = false;
+        let synth = window.speechSynthesis;
+        
+        // Kiểm tra trình duyệt hỗ trợ Web Speech API
+        if (!synth) {
+            alert("Trình duyệt của bạn không hỗ trợ đọc văn bản. Vui lòng dùng Chrome/Firefox/Safari mới nhất.");
+        }
+        
+        function speakWord(word) {
+            if (synth) {
+                synth.cancel(); // Dừng đọc câu trước
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US'; // Giọng đọc tiếng Anh
+                utterance.rate = 0.8; // Tốc độ chậm
+                synth.speak(utterance);
+            }
+        }
+        
+        function createGameBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+            
+            // Hiển thị loading nếu hình ảnh chưa tải xong
+            gameBoard.innerHTML = '<div class="loading">Đang tải trò chơi...</div>';
+            
+            // Trộn mảng từ ngẫu nhiên
+            const shuffledWords = [...words].sort(() => Math.random() - 0.5).slice(0, 6);
+            
+            // Tạo các ô từ
+            let loadedImages = 0;
+            shuffledWords.forEach(wordObj => {
+                const box = document.createElement('div');
+                box.className = 'word-box';
+                
+                // Thêm hình ảnh
+                const img = document.createElement('img');
+                img.src = wordObj.image;
+                img.alt = wordObj.word;
+                img.onload = () => {
+                    loadedImages++;
+                    if (loadedImages === shuffledWords.length) {
+                        document.querySelector('.loading')?.remove();
+                    }
+                };
+                
+                // Thêm từ
+                const wordText = document.createElement('div');
+                wordText.textContent = wordObj.word;
+                
+                // Thêm icon loa
+                const speaker = document.createElement('img');
+                speaker.src = 'https://openmoji.org/data/color/svg/1F50A.svg';
+                speaker.className = 'speaker-icon';
+                speaker.onclick = (e) => {
+                    e.stopPropagation();
+                    speakWord(wordObj.word);
+                };
+                
+                box.appendChild(img);
+                box.appendChild(wordText);
+                box.appendChild(speaker);
+                
+                box.onclick = function() {
+                    if (!gameStarted) return;
+                    if (wordText.textContent === currentWord) {
+                        this.classList.add('selected');
+                        score++;
+                        document.getElementById('score').textContent = score;
+                        document.getElementById('actionText').textContent = wordObj.action;
+                        speakWord(wordObj.word);
+                        setTimeout(() => {
+                            this.classList.remove('selected');
+                            nextWord();
+                        }, 1500);
+                    }
+                };
+                gameBoard.appendChild(box);
+            });
+        }
+        
+        function startGame() {
+            score = 0;
+            document.getElementById('score').textContent = score;
+            gameStarted = true;
+            createGameBoard();
+            nextWord();
+        }
+        
+        function nextWord() {
+            if (!gameStarted) return;
+            const boxes = document.querySelectorAll('.word-box div:nth-child(2)');
+            if (boxes.length === 0) return;
+            
+            const randomIndex = Math.floor(Math.random() * boxes.length);
+            currentWord = boxes[randomIndex].textContent;
+            document.getElementById('actionText').textContent = `Tìm từ: ${currentWord}`;
+            speakWord(currentWord);
+        }
+        
+        function speakCurrentWord() {
+            if (currentWord) {
+                speakWord(currentWord);
+            }
+        }
+        
+        // Khởi tạo khi tải trang
+        window.onload = () => {
+            // Kiểm tra quyền sử dụng giọng nói
+            if (synth && synth.onvoiceschanged !== undefined) {
+                synth.onvoiceschanged = createGameBoard;
+            }
+            createGameBoard();
+        };
+    </script>
+</body>
+</html>
