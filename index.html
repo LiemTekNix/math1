@@ -122,29 +122,156 @@
   <div class="stars" id="stars"></div>
 
   <script>
+    let score = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let playerName = "bé";
+
     function startGame() {
-      alert("Game bắt đầu! (Chức năng startGame đã được định nghĩa)");
+      const input = document.getElementById("playerNameInput").value.trim();
+      if (input !== "") playerName = input;
+      document.getElementById("playerNameBox").style.display = "none";
+      generateQuestion();
+    }
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById("score").textContent = `Tổng điểm: ${score} ⭐ | Đúng: ${correctCount} ✅ | Sai: ${wrongCount} ❌`;
+      updateBadges();
+    }
+
+    function updateBadges() {
+      const badgeBox = document.getElementById("badgeBox");
+      const badges = Math.floor(score / 5);
+      if (badges > 0) {
+        badgeBox.innerHTML = `🏅 ${playerName} đã đạt ${badges} huy hiệu! 🎉`;
+        const messages = [
+          "Bạn giỏi lắm!",
+          "Siêu sao toán học!",
+          "Tuyệt đỉnh công phu!",
+          "Không ai đọ lại bạn!",
+          "Thật là xuất sắc!"
+        ];
+        const msg = messages[Math.floor(Math.random() * messages.length)];
+        alert(`🎉 Chúc mừng ${playerName}! ${msg}`);
+        showStars();
+      } else {
+        badgeBox.innerHTML = "";
+      }
     }
 
     function resetGame() {
-      alert("Game đã được đặt lại!");
+      score = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      updateScoreDisplay();
+      generateQuestion();
     }
 
     function setTheme(theme) {
       const body = document.body;
-      switch (theme) {
-        case 'princess':
-          body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2020/03/03/09/33/fairy-tale-4897321_1280.jpg')";
-          break;
-        case 'superhero':
-          body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2018/10/30/09/15/superhero-3785814_1280.jpg')";
-          break;
-        case 'robot':
-          body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2014/04/03/10/32/robot-311644_1280.png')";
-          break;
-        default:
-          body.style.backgroundImage = '';
+      if (theme === 'princess') {
+        body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2020/03/03/09/33/fairy-tale-4897321_1280.jpg')";
+      } else if (theme === 'superhero') {
+        body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2018/10/30/09/15/superhero-3785814_1280.jpg')";
+      } else if (theme === 'robot') {
+        body.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2014/04/03/10/32/robot-311644_1280.png')";
+      } else {
+        body.style.backgroundImage = "none";
       }
+    }
+
+    function showStars() {
+      const container = document.getElementById("stars");
+      for (let i = 0; i < 20; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = "100%";
+        container.appendChild(star);
+        setTimeout(() => star.remove(), 1000);
+      }
+    }
+
+    function generateMiniGameIfNeeded() {
+      if ((correctCount + wrongCount) % 5 === 0 && correctCount + wrongCount !== 0) {
+        alert("🎲 Mini game: Hãy đứng lên và đếm ngược từ 5 đến 1 rồi nhảy lên!");
+      }
+    }
+
+    function generateQuestion() {
+      generateMiniGameIfNeeded();
+
+      const modeOptions = ['add', 'sub', 'mul'];
+      const mode = modeOptions[Math.floor(Math.random() * modeOptions.length)];
+
+      let num1, num2, questionText, correctAnswer;
+
+      if (mode === 'add') {
+        do {
+          num1 = randomInt(10, 90);
+          num2 = randomInt(10, 90);
+          correctAnswer = num1 + num2;
+        } while (correctAnswer > 100);
+        questionText = `${num1} + ${num2} = ?`;
+      } else if (mode === 'sub') {
+        num1 = randomInt(20, 100);
+        num2 = randomInt(10, num1);
+        correctAnswer = num1 - num2;
+        questionText = `${num1} - ${num2} = ?`;
+      } else {
+        num1 = 2;
+        num2 = randomInt(1, 10);
+        correctAnswer = num1 * num2;
+        questionText = `${num1} × ${num2} = ?`;
+      }
+
+      document.getElementById("question").textContent = questionText;
+      updateScoreDisplay();
+
+      const imageBox = document.getElementById("images");
+      imageBox.innerHTML = "";
+      const imgURL = "https://cdn-icons-png.flaticon.com/512/616/616408.png";
+      let count = Math.min(correctAnswer, 20);
+      for (let i = 0; i < count; i++) {
+        const img = document.createElement("img");
+        img.src = imgURL;
+        imageBox.appendChild(img);
+      }
+
+      let answers = [correctAnswer];
+      while (answers.length < 3) {
+        const delta = randomInt(-10, 10);
+        const wrong = correctAnswer + delta;
+        if (!answers.includes(wrong) && wrong >= 0) {
+          answers.push(wrong);
+        }
+      }
+      answers.sort(() => Math.random() - 0.5);
+
+      const answerDiv = document.getElementById("answers");
+      answerDiv.innerHTML = "";
+      answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.textContent = ans;
+        btn.className = "btn";
+        btn.onclick = () => {
+          if (ans === correctAnswer) {
+            document.getElementById("voiceCorrect").play();
+            score++;
+            correctCount++;
+          } else {
+            document.getElementById("voiceWrong").play();
+            wrongCount++;
+          }
+          updateScoreDisplay();
+          setTimeout(() => generateQuestion(), 1000);
+        };
+        answerDiv.appendChild(btn);
+      });
     }
   </script>
 </body>
